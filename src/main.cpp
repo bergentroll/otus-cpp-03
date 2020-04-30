@@ -2,6 +2,10 @@
 #include <iostream>
 #include <map>
 
+#include <vector>
+
+#include "allocator.h"
+
 using namespace std;
 
 int fac(int x) { return x == 0? 1: x * fac(x - 1); }
@@ -17,11 +21,13 @@ int main(int argc, char **argv) {
   for (int i { 0 }; i < 10; i++) m[i] = fac(i);
   print(m);
 
-  //map<int, int, allocator<5>> m_al { };
+  //map<int, int, otus::Allocator> m_al { };
+  //map<int, int, otus::allocator<5>> m_al { };
   //m_al.reserve(10);
   //for (int i { 0 }; i < 10; i++) m_al[i] = i * i;
   //print(m_al);
 
+  vector<int, otus::Allocator> v { };
   //container<int> c { };
   //for (int i { 0 }; i < 10; c.push_back(i++));
   //print(c);
