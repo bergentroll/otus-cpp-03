@@ -2,10 +2,10 @@
 #define ALLOCATOR_H
 
 #include <cstdlib>
-
+#include <climits>
 
 namespace otus {
-  template <typename T>
+  template <typename T, int ssize = 0>
   class Allocator {
   public:
     using value_type =T;
@@ -18,10 +18,10 @@ namespace otus {
     Allocator() = default;
     ~Allocator() = default;
 
-    //template<typename U>
-    //struct rebind {
-    //  using other = Allocator<U>;
-    //};
+    template<typename U>
+    struct rebind {
+      using other = Allocator<U, ssize>;
+    };
 
     size_type max_size() const {
         return std::numeric_limits<size_type>::max();
@@ -38,19 +38,13 @@ namespace otus {
       std::free(ptr);
     }
 
-/*
     template<typename U, typename ...Args>
-    void construct(U *p, Args &&...args) {
-        std::cout << BLUE << __PRETTY_FUNCTION__ << WHITE << std::endl;
-        new(p) U(std::forward<Args>(args)...);
-    };
+    void construct(U *ptr, Args &&...args) {
+        new(ptr) U(std::forward<Args>(args)...);
+    }
 
     template<typename U>
-    void destroy(U *p) {
-        std::cout << YELLOW << __PRETTY_FUNCTION__ << WHITE << std::endl;
-        p->~U();
-    }
-    */
+    void destroy(U *ptr) { ptr->~U(); }
 
     // а для соответствия стандарту еще нужно
     // 1. функция address
