@@ -1,6 +1,4 @@
-/** TODO Incapsulate defines.
- *  TODO Profiling.
- */
+// TODO Profiling.
 
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H

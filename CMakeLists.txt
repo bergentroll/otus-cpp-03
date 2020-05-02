@@ -19,12 +19,7 @@ if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   add_compile_definitions(DEBUG)
 endif()
 
-add_library(
-  allocator_obj
-  ${SRC_PATH}/allocator.cpp)
-
 add_executable(allocator ${SRC_PATH}/main.cpp)
-target_link_libraries(allocator allocator_obj)
 
 if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
   add_subdirectory(${GTEST_SRCDIR}/ ${CMAKE_BINARY_DIR}/gtest/ EXCLUDE_FROM_ALL)
@@ -33,7 +28,6 @@ if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
   target_link_libraries(
     test_suite
     PRIVATE
-    allocator_obj
     gtest)
   enable_testing()
   add_test(test_suite test_suite)
