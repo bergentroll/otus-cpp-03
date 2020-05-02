@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   //map<int, int, otus::logging_allocator<pair<int, int>>> m_al { };
   //map<int, int, otus::allocator<5>> m_al { };
   //m_al.reserve(10);
-  for (int i { 0 }; i < 10; i++) m_al[i] = fac(i);
+  //for (int i { 0 }; i < 10; i++) m_al[i] = fac(i);
   print(m_al);
 
   //vector<int, otus::Allocator<int>> v { };

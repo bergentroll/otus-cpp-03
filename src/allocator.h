@@ -1,14 +1,11 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-#include <cstdio>
-
-#include <cstdlib>
 #include <limits>
 #include <new>
 
 namespace otus {
-  template <typename T, int ssize = 0>
+  template <typename T, int chunk_size = 0>
   class Allocator {
   public:
     using value_type =T;
@@ -18,16 +15,13 @@ namespace otus {
     using const_reference = const T&;
     using size_type = std::size_t;
 
-    Allocator() {
-      pool = (pointer)calloc(ssize, sizeof(T));
-    }
+    Allocator():
+    chunk(reinterpret_cast<pointer>(operator new[](chunk_size * sizeof(T)))) { }
 
-    ~Allocator() {
-      free(pool);
-    }
+    ~Allocator() { operator delete[](chunk); }
 
     template<typename U>
-    struct rebind { using other = Allocator<U, ssize>; };
+    struct rebind { using other = Allocator<U, chunk_size>; };
 
     size_type max_size() const {
         return std::numeric_limits<size_type>::max();
@@ -35,9 +29,8 @@ namespace otus {
 
     [[ nodiscard ]]
     pointer allocate(size_type size) {
-      printf("Allocating %i items.\n", size);
-      if (cursor + size > ssize) throw std::bad_alloc();
-      auto ptr { &pool[cursor] };
+      if (cursor + size > chunk_size) throw std::bad_alloc();
+      auto ptr { &chunk[cursor] };
       cursor += size;
       return ptr;
     }
@@ -56,7 +49,7 @@ namespace otus {
     // 1. функция address
     // 2. операторы сравнения == и !=
     private:
-      pointer pool { nullptr };
+      pointer chunk;
       size_type cursor { 0 };
   };
 }
