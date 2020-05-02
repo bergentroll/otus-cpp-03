@@ -21,21 +21,9 @@ int main(int argc, char **argv) {
   for (int i { 0 }; i < 10; i++) m[i] = fac(i);
   print(m);
 
-  map<int, int, std::less<int>, otus::Allocator<pair<int, int>, 10>> m_tmp { };
-  //map<int, int, otus::logging_allocator<pair<int, int>>> m_tmp { };
-  //map<int, int, otus::allocator<5>> m_tmp { };
-  //m_tmp.reserve(10);
-  for (int i { 0 }; i < 10; i++) m_tmp[i] = fac(i);
-  print(m_tmp);
-
-  map<int, int, std::less<int>, otus::Allocator<pair<int, int>, 8>> m_al { };
-  //map<int, int, otus::logging_allocator<pair<int, int>>> m_al { };
-  //map<int, int, otus::allocator<5>> m_al { };
-  //m_al.reserve(10);
-  //for (int i { 0 }; i < 10; i++) m_al[i] = fac(i);
+  map<int, int, std::less<int>, otus::Allocator<pair<int, int>, 10>> m_al { };
+  for (int i { 0 }; i < 10; i++) m_al[i] = fac(i);
   print(m_al);
-
-  //vector<int, otus::Allocator<int>> v { };
 
   //container<int> c { };
   //for (int i { 0 }; i < 10; c.push_back(i++));

@@ -1,12 +1,15 @@
+/** TODO Incapsulate defines.
+ *  TODO Profiling.
+ */
+
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
 #include <limits>
 #include <new>
+#include <map>
 
-#ifdef DEBUG
-#include <iostream>
-#endif
+#include "logger.h"
 
 namespace otus {
   template <typename T, int chunk_size = 0>
@@ -23,10 +26,7 @@ namespace otus {
     chunk(reinterpret_cast<pointer>(operator new[](chunk_size * sizeof(T)))) { }
 
     ~Allocator() {
-      #ifdef DEBUG
-      std::cerr << "Deleting pool." << std::endl;
-      #endif
-
+      log("Deleting pool.");
       operator delete[](chunk);
     }
 
@@ -39,10 +39,7 @@ namespace otus {
 
     [[ nodiscard ]]
     pointer allocate(size_type size) {
-      #ifdef DEBUG
-      std::cerr << "Allocate memory for " << size << " items." << std::endl;
-      #endif
-
+      log("Allocate memory for " + std::to_string(size) + " items.");
       if (cursor + size > chunk_size) throw std::bad_alloc();
       auto ptr { &chunk[cursor] };
       cursor += size;
@@ -50,9 +47,7 @@ namespace otus {
     }
 
     void deallocate(pointer ptr, size_type size) noexcept {
-      #ifdef DEBUG
-      std::cerr << "Query for deallocation, do nothing." << std::endl;
-      #endif
+      log("Query for deallocation, do nothing.");
     }
 
     template<typename U, typename ...Args>
@@ -63,9 +58,9 @@ namespace otus {
     template<typename U>
     void destroy(U *ptr) { ptr->~U(); }
 
-    // а для соответствия стандарту еще нужно
-    // 1. функция address
-    // 2. операторы сравнения == и !=
+    // TODO функция address
+    // TODO операторы сравнения == и !=
+
     private:
       pointer chunk;
       size_type cursor { 0 };
