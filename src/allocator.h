@@ -1,8 +1,11 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
+#include <cstdio>
+
 #include <cstdlib>
-#include <climits>
+#include <limits>
+#include <new>
 
 namespace otus {
   template <typename T, int ssize = 0>
@@ -15,13 +18,16 @@ namespace otus {
     using const_reference = const T&;
     using size_type = std::size_t;
 
-    Allocator() = default;
-    ~Allocator() = default;
+    Allocator() {
+      pool = (pointer)calloc(ssize, sizeof(T));
+    }
+
+    ~Allocator() {
+      free(pool);
+    }
 
     template<typename U>
-    struct rebind {
-      using other = Allocator<U, ssize>;
-    };
+    struct rebind { using other = Allocator<U, ssize>; };
 
     size_type max_size() const {
         return std::numeric_limits<size_type>::max();
@@ -29,14 +35,14 @@ namespace otus {
 
     [[ nodiscard ]]
     pointer allocate(size_type size) {
-      auto ptr { std::malloc(size * sizeof(T)) };
-      if (!ptr) throw std::bad_alloc();
-      return reinterpret_cast<pointer>(ptr);
+      printf("Allocating %i items.\n", size);
+      if (cursor + size > ssize) throw std::bad_alloc();
+      auto ptr { &pool[cursor] };
+      cursor += size;
+      return ptr;
     }
 
-    void deallocate(pointer ptr, size_type size) noexcept {
-      std::free(ptr);
-    }
+    void deallocate(pointer ptr, size_type size) noexcept { }
 
     template<typename U, typename ...Args>
     void construct(U *ptr, Args &&...args) {
@@ -49,6 +55,9 @@ namespace otus {
     // а для соответствия стандарту еще нужно
     // 1. функция address
     // 2. операторы сравнения == и !=
+    private:
+      pointer pool { nullptr };
+      size_type cursor { 0 };
   };
 }
 

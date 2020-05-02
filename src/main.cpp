@@ -21,7 +21,14 @@ int main(int argc, char **argv) {
   for (int i { 0 }; i < 10; i++) m[i] = fac(i);
   print(m);
 
-  map<int, int, std::less<int>, otus::Allocator<pair<int, int>>> m_al { };
+  map<int, int, std::less<int>, otus::Allocator<pair<int, int>, 10>> m_tmp { };
+  //map<int, int, otus::logging_allocator<pair<int, int>>> m_tmp { };
+  //map<int, int, otus::allocator<5>> m_tmp { };
+  //m_tmp.reserve(10);
+  for (int i { 0 }; i < 10; i++) m_tmp[i] = fac(i);
+  print(m_tmp);
+
+  map<int, int, std::less<int>, otus::Allocator<pair<int, int>, 8>> m_al { };
   //map<int, int, otus::logging_allocator<pair<int, int>>> m_al { };
   //map<int, int, otus::allocator<5>> m_al { };
   //m_al.reserve(10);
