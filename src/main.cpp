@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "allocator.h"
+#include "container.h"
 
 using namespace std;
 
@@ -25,12 +26,13 @@ int main(int argc, char **argv) {
   for (int i { 0 }; i < 10; i++) m_al[i] = fac(i);
   print(m_al);
 
-  //container<int> c { };
-  //for (int i { 0 }; i < 10; c.push_back(i++));
+  otus::Container<int> c { };
+  for (int i { 0 }; i < 10; c.push_back(i++));
   //print(c);
 
-  //container<int> c_al { };
-  //for (int i { 0 }; i < 10; c_al.push_back(i++));
+  cout << ">>" << endl;
+  otus::Container<int, otus::Allocator<int, 10>> c_al { };
+  for (int i { 0 }; i < 10; c_al.push_back(i++));
   //print(c_al);
 
   return EXIT_SUCCESS;

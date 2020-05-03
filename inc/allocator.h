@@ -13,7 +13,7 @@ namespace otus {
   template <typename T, int chunk_size = 0>
   class Allocator {
   public:
-    using value_type =T;
+    using value_type = T;
     using pointer = T*;
     using const_pointer = const T*;
     using reference = T&;
@@ -50,7 +50,8 @@ namespace otus {
 
     template<typename U, typename ...Args>
     void construct(U *ptr, Args &&...args) {
-        new(ptr) U(std::forward<Args>(args)...);
+      log("Emplace item.");
+      new(ptr) U(std::forward<Args>(args)...);
     }
 
     template<typename U>
