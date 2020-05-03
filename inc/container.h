@@ -15,24 +15,39 @@ namespace otus {
     using reference = T&;
     using const_reference = const T&;
     using size_type = std::size_t;
-    //using allocator_type = Allocator;
     using allocator_type = typename Allocator::template rebind<Node>::other;
 
     class Iterator {
     public:
-      reference operator*() const { }
-      void operator++() { }
+      Iterator(Node *node): node(node) { }
+
+      reference operator*() const { return node->data; }
+
+      void operator++() { node = node-> next; }
+
+      bool operator==(const Iterator &other) const {
+        return node == other.node;
+      }
+
+      bool operator!=(const Iterator &other) const {
+        return !(*this == other);
+      }
+
     private:
+      Node *node;
     };
 
     using iterator = Iterator;
 
     Container() { }
 
+    // TODO
     Container(std::initializer_list<value_type> list) { }
 
+    // TODO
     Container(const Container<T> &source);
 
+    // TODO
     Container& operator=(const Container<T> &other);
 
     ~Container() {
@@ -44,35 +59,57 @@ namespace otus {
       }
     }
 
-    reference operator[](std::size_t i) { }
+    reference operator[](std::size_t pos) {
+      auto cursor { list_head };
+      for (size_t i { 0 }; i < pos; i++) {
+        cursor = cursor->next;
+      }
+      return cursor->data;
+    }
 
-    reference at(std::size_t i) { }
+    const_reference operator[](std::size_t pos) const {
+      return *this[pos];
+    }
+
+    // TODO
+    reference at(std::size_t pos) { }
+
+    // TODO
+    const_reference at(std::size_t pos) const { }
 
     void push_back(value_type item) {
+      log("Pushing back value " + std::to_string(item));
+
       auto ptr { allocator.allocate(1) };
       allocator.construct(ptr, Node { item });
+
       if (!list_head) {
         list_head = ptr;
-        list_cursor = list_head;
-      } else {
-        list_cursor->next = ptr;
-        list_cursor = list_cursor->next;
+        return;
       }
+
+      auto cursor { list_head };
+      while (cursor->next) { 
+        log("VAL: " + std::to_string(cursor->data));
+        cursor = cursor->next;
+      }
+
+      cursor->next = ptr;
     }
 
     allocator_type& get_allocator() { return allocator; }
 
-    iterator begin() { };
-    iterator end() { };
+    iterator begin() { return iterator(list_head); };
+    iterator end() { return Iterator(nullptr); };
 
   private:
     struct Node {
-      reference data;
+      value_type data;
       Node *next { nullptr };
     };
 
     allocator_type allocator { };
-    Node *list_head { nullptr }, *list_cursor { nullptr };
+    Node *list_head { nullptr };
   };
 }
 
