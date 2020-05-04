@@ -41,8 +41,9 @@ namespace otus {
 
     Container() { }
 
-    // TODO
-    Container(std::initializer_list<value_type> list) { }
+    Container(std::initializer_list<value_type> init) {
+      for (const_reference item: init) push_back(item);
+    }
 
     // TODO
     Container(const Container<T> &source);
@@ -59,7 +60,30 @@ namespace otus {
       }
     }
 
+    size_type size() const {
+      size_type size { };
+      auto cursor { list_head };
+      while (cursor) {
+        cursor = cursor->next;
+        size++;
+      }
+      return size;
+    }
+
+    bool operator==(const Container &other) const {
+      if (size() != other.size()) return false;
+
+      for (size_type i { }; i < size(); i++)
+        if ((*this)[0] != other[0]) return false;
+
+      return true;
+    }
+
     reference operator[](std::size_t pos) {
+      return const_cast<reference>(static_cast<const Container &>(*this)[pos]);
+    }
+
+    const_reference operator[](std::size_t pos) const {
       auto cursor { list_head };
       for (size_t i { 0 }; i < pos; i++) {
         cursor = cursor->next;
@@ -67,15 +91,15 @@ namespace otus {
       return cursor->data;
     }
 
-    const_reference operator[](std::size_t pos) const {
-      return *this[pos];
+    reference at(std::size_t pos) {
+      return const_cast<reference>(static_cast<const Container &>(*this).at(pos));
     }
 
-    // TODO
-    reference at(std::size_t pos) { }
-
-    // TODO
-    const_reference at(std::size_t pos) const { }
+    const_reference at(std::size_t pos) const { 
+      if (pos >= size())
+        throw std::out_of_range("Index " + std::to_string(pos) + " is out of range.");
+      return operator[](pos);
+    }
 
     void push_back(value_type item) {
       log("Pushing back value " + std::to_string(item));

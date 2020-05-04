@@ -13,14 +13,12 @@ int fac(int x) { return x == 0? 1: x * fac(x - 1); }
 
 template <typename T, typename Key, class Compare, class Allocator>
 void print(const map<T, Key, Compare, Allocator> &m) {
-  for (const auto &[key, val]: m)
-    cout << key << ' ' << val << endl;
+  for (const auto &[key, val]: m) cout << key << ' ' << val << endl;
 }
 
 template <typename T, class Allocator>
 void print(otus::Container<T, Allocator> &c) {
-  for (const auto &val: c)
-    cout << val << endl;
+  for (const auto &val: c) cout << val << endl;
 }
 
 int main(int argc, char **argv) {
