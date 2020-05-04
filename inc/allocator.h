@@ -20,6 +20,9 @@ namespace otus {
     using const_reference = const T&;
     using size_type = std::size_t;
 
+    template<typename U>
+    struct rebind { using other = Allocator<U, chunk_size>; };
+
     Allocator():
     chunk(reinterpret_cast<pointer>(operator new[](chunk_size * sizeof(T)))) { }
 
@@ -27,9 +30,6 @@ namespace otus {
       log("Deleting pool.");
       operator delete[](chunk);
     }
-
-    template<typename U>
-    struct rebind { using other = Allocator<U, chunk_size>; };
 
     size_type max_size() const {
         return std::numeric_limits<size_type>::max();
@@ -44,21 +44,37 @@ namespace otus {
       return ptr;
     }
 
-    void deallocate(pointer ptr, size_type size) noexcept {
+    void deallocate(pointer ptr, size_type size) const noexcept {
       log("Query for deallocation, do nothing.");
     }
 
     template<typename U, typename ...Args>
-    void construct(U *ptr, Args &&...args) {
+    void construct(U *ptr, Args &&...args) const {
       log("Emplace item.");
       new(ptr) U(std::forward<Args>(args)...);
     }
 
     template<typename U>
-    void destroy(U *ptr) { ptr->~U(); }
+    void destroy(U *ptr) const { ptr->~U(); }
 
-    // TODO функция address
-    // TODO операторы сравнения == и !=
+    bool operator==(Allocator const &other) const noexcept {
+      if (chunk == other.chunk) return true;
+      return false;
+    }
+
+    bool operator!=(Allocator const &other) const noexcept {
+      return !(*this == other);
+    }
+
+    [[ deprecated ]]
+    pointer address(reference x) const noexcept {
+      return &x;
+    }
+
+    [[ deprecated ]]
+    const_pointer address(const_reference x) const noexcept {
+      return &x;
+    }
 
     private:
       pointer chunk;
