@@ -40,6 +40,19 @@ TEST(container, size) {
   ASSERT_EQ(c.size(), 4);
 }
 
+TEST(container, assign_ctr) {
+  otus::Container<char> source { 'a', 'b', 'c', '\n' };
+  otus::Container<char> c { source };
+  ASSERT_EQ(c, source);
+}
+
+TEST(container, assign_op) {
+  otus::Container<char> c1 { 'a', 'b', 'c', '\n' };
+  otus::Container<char> c2 { 'c', 'd', 'e' };
+  c2 = c1;
+  ASSERT_EQ(c1, c2);
+}
+
 TEST(container, at) {
   otus::Container<long> c { 100, 1000, 10000 };
   ASSERT_NO_THROW(c.at(2));

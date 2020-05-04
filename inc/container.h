@@ -41,23 +41,25 @@ namespace otus {
 
     Container() { }
 
+    // TODO Move semantics.
+
     Container(std::initializer_list<value_type> init) {
       for (const_reference item: init) push_back(item);
     }
 
-    // TODO
-    Container(const Container<T> &source);
+    Container(const Container<T> &source) {
+      for (const_reference item: source)
+        push_back(item);
+    }
 
-    // TODO
-    Container& operator=(const Container<T> &other);
+    Container& operator=(const Container<T> &other) {
+      deconstruct(); 
+
+      for (const_reference item: other) push_back(item);
+    }
 
     ~Container() {
-      auto cursor { list_head };
-      while (cursor) {
-        cursor = list_head->next;
-        allocator.deallocate(list_head, 1);
-        list_head = cursor;
-      }
+      deconstruct();
     }
 
     size_type size() const {
@@ -74,7 +76,7 @@ namespace otus {
       if (size() != other.size()) return false;
 
       for (size_type i { }; i < size(); i++)
-        if ((*this)[0] != other[0]) return false;
+        if (operator[](0) != other[0]) return false;
 
       return true;
     }
@@ -124,7 +126,12 @@ namespace otus {
     allocator_type& get_allocator() { return allocator; }
 
     iterator begin() { return iterator(list_head); };
+
     iterator end() { return Iterator(nullptr); };
+
+    const iterator begin() const { return iterator(list_head); };
+
+    const iterator end() const { return Iterator(nullptr); };
 
   private:
     struct Node {
@@ -134,6 +141,15 @@ namespace otus {
 
     allocator_type allocator { };
     Node *list_head { nullptr };
+
+    void deconstruct() {
+      auto cursor { list_head };
+      while (cursor) {
+        cursor = list_head->next;
+        allocator.deallocate(list_head, 1);
+        list_head = cursor;
+      }
+    }
   };
 }
 
