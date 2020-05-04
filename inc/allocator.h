@@ -58,8 +58,13 @@ namespace otus {
     void destroy(U *ptr) const { ptr->~U(); }
 
     bool operator==(Allocator const &other) const noexcept {
-      if (chunk == other.chunk) return true;
-      return false;
+      if (cursor != other.cursor) return false;
+
+      for (size_t i { 0 }; i < cursor; ++i) {
+        if (chunk[i] != other.chunk[i]) return false;
+      }
+
+      return true;
     }
 
     bool operator!=(Allocator const &other) const noexcept {
