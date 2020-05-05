@@ -5,10 +5,20 @@
 
 using namespace::std;
 
-TEST(allocator, overflow) {
-  vector<int, otus::Allocator<int, 1>> v;
-  ASSERT_NO_THROW(v.push_back(0));
-  ASSERT_THROW(v.push_back(0), std::bad_alloc);
+//TEST(allocator, overflow) {
+//  vector<int, otus::Allocator<int, 1>> v;
+//  ASSERT_NO_THROW(v.push_back(0));
+//  ASSERT_NO_THROW(v.push_back(0));
+//}
+
+TEST(allocator, comparison) {
+  vector<int, otus::Allocator<int, 3>> v1 { 1, 2, 3 }; 
+  vector<int, otus::Allocator<int, 3>> v2 { 1, 2, 3 }; 
+
+  ASSERT_EQ(v1.get_allocator(), v2.get_allocator());
+
+  v2.push_back(4);
+  ASSERT_NE(v1.get_allocator(), v2.get_allocator());
 }
 
 TEST(container, normal_usage) {
@@ -66,6 +76,7 @@ TEST(container, at) {
   ASSERT_NO_THROW(c_const.at(2));
   ASSERT_THROW(c_const.at(3), std::out_of_range);
 }
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

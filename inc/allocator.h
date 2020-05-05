@@ -1,6 +1,3 @@
-// TODO Profiling.
-// TODO New chunk on overflow.
-
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
@@ -11,7 +8,8 @@
 #include "logger.h"
 
 namespace otus {
-  template <typename T, int chunk_size = 0>
+  /// TODO Use smart pointers.
+  template <typename T, size_t base_chunk_size = 1>
   class Allocator {
   public:
     using value_type = T;
@@ -22,26 +20,89 @@ namespace otus {
     using size_type = std::size_t;
 
     template<typename U>
-    struct rebind { using other = Allocator<U, chunk_size>; };
+    struct rebind { using other = Allocator<U, base_chunk_size>; };
 
-    Allocator():
-    chunk(reinterpret_cast<pointer>(operator new[](chunk_size * sizeof(T)))) { }
+    Allocator(): list_head(new Node), list_cursor(list_head), chunk_index(0) {
+      LOG("Allocator::Allocator()." << std::endl);
+      // TODO Squash to method.
+      list_head->chunk =
+        reinterpret_cast<pointer>(
+          operator new[](base_chunk_size * sizeof(value_type)));
+      list_head->chunk_size = base_chunk_size;
+    }
+
+    Allocator(const Allocator &other) {
+      LOG("Allocator::Allocator(Allocator &other)." << std::endl);
+      chunk_index = other.chunk_index;
+
+      list_head = create_chunk(other.list_head->chunk_size);
+      for (size_type i { }; i < other.list_head->chunk_size; i++)
+        list_head->chunk[i] = other.list_head->chunk[i];
+      list_cursor = list_head;
+
+      auto left_list_cursor { list_head };
+      auto right_list_cursor { other.list_head};
+
+      while (right_list_cursor->next) {
+        right_list_cursor = right_list_cursor->next;
+        left_list_cursor->next = create_chunk(other.list_head->chunk_size);
+        left_list_cursor = left_list_cursor->next;
+
+        for (size_type i { }; i < left_list_cursor->chunk_size; i++)
+          left_list_cursor->chunk[i] = right_list_cursor->chunk[i];
+
+        list_cursor = left_list_cursor;
+      }
+    }
+
+    /// TODO
+    Allocator(const Allocator &&other) = delete;
+
+    /// TODO
+    Allocator & operator=(const Allocator &other) = delete;
+
+    /// TODO
+    Allocator & operator=(const Allocator &&other) = delete;
 
     ~Allocator() {
       LOG("Deleting pool." << std::endl);
-      operator delete[](chunk);
+
+      list_cursor = list_head;
+      Node *list_prev { nullptr };
+
+      while (list_cursor) {
+        LOG("|-Deleting chunk." << std::endl);
+        operator delete[](list_cursor->chunk);
+        list_prev = list_cursor;
+        list_cursor = list_cursor->next;
+        delete list_prev;
+      }
     }
 
-    size_type max_size() const {
-        return std::numeric_limits<size_type>::max();
+    static size_type max_size(const Allocator &a) noexcept {
+        return std::numeric_limits<size_type>::max() / sizeof(value_type);
     }
 
     [[ nodiscard ]]
     pointer allocate(size_type size) {
       LOG("Allocate memory for " << size << " items." << std::endl);
-      if (cursor + size > chunk_size) throw std::bad_alloc();
-      auto ptr { &chunk[cursor] };
-      cursor += size;
+
+      if (size > list_cursor->chunk_size - chunk_index) {
+        list_cursor->next = new Node;
+        list_cursor = list_cursor->next;
+        auto new_chunk_size { std::max(base_chunk_size, size) };
+
+        LOG("|-Allocating new chunk of size " << new_chunk_size << std::endl);
+
+        list_cursor->chunk =
+          reinterpret_cast<pointer>(
+            operator new[](new_chunk_size * sizeof(value_type)));
+        list_cursor->chunk_size = new_chunk_size;
+        chunk_index = 0;
+      }
+
+      auto ptr { &list_cursor->chunk[chunk_index] };
+      chunk_index += size;
       return ptr;
     }
 
@@ -59,11 +120,24 @@ namespace otus {
     void destroy(U *ptr) const { ptr->~U(); }
 
     bool operator==(Allocator const &other) const noexcept {
-      if (cursor != other.cursor) return false;
+      if (chunk_index != other.chunk_index)
+        return false;
 
-      for (size_t i { 0 }; i < cursor; ++i) {
-        if (chunk[i] != other.chunk[i]) return false;
+      auto left_list_cursor { list_head };
+      auto right_list_cursor { other.list_head };
+
+      while (left_list_cursor && right_list_cursor) {
+        if (left_list_cursor->chunk_size != right_list_cursor->chunk_size)
+          return false;
+        for (size_t i { }; i < left_list_cursor->chunk_size; i++) {
+          if (left_list_cursor->chunk[i] != right_list_cursor->chunk[i])
+            return false;
+        }
+        left_list_cursor = left_list_cursor->next;
+        right_list_cursor = right_list_cursor->next;
       }
+
+      if (left_list_cursor != right_list_cursor) return false;
 
       return true;
     }
@@ -83,8 +157,26 @@ namespace otus {
     }
 
     private:
-      pointer chunk;
-      size_type cursor { 0 };
+      struct Node {
+        pointer chunk;
+        size_type chunk_size;
+        Node *next { nullptr };
+      };
+
+      Node *list_head;
+      Node *list_cursor;
+      size_type chunk_index;
+
+      [[ nodiscard ]]
+      Node * create_chunk(size_type size) {
+        auto ptr { new Node };
+        ptr->chunk =
+          reinterpret_cast<pointer>(
+              operator new[](size * sizeof(value_type)));
+        ptr->chunk_size = size;
+        return ptr;
+      }
+
   };
 }
 

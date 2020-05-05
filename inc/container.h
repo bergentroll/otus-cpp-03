@@ -44,7 +44,6 @@ namespace otus {
     Container() { }
 
     // TODO Move semantics.
-    // TODO Smart pointers.
 
     Container(std::initializer_list<value_type> init) {
       for (const_reference item: init) push_back(item);
