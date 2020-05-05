@@ -3,7 +3,7 @@
 #include "container.h"
 #include "allocator.h"
 
-constexpr size_t SIZE { 10000 };
+constexpr size_t SIZE { 100 };
 
 template <typename T>
 void run_container() {

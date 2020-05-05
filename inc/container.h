@@ -112,7 +112,7 @@ namespace otus {
     }
 
     void push_back(value_type item) {
-      log("Pushing back value " + std::to_string(item) + ".");
+      LOG("Pushing back value " << item << '.' << std::endl);
 
       auto ptr { allocator.allocate(1) };
       allocator.construct(ptr, Node { item });

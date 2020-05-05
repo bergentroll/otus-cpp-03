@@ -28,7 +28,7 @@ namespace otus {
     chunk(reinterpret_cast<pointer>(operator new[](chunk_size * sizeof(T)))) { }
 
     ~Allocator() {
-      log("Deleting pool.");
+      LOG("Deleting pool." << std::endl);
       operator delete[](chunk);
     }
 
@@ -38,7 +38,7 @@ namespace otus {
 
     [[ nodiscard ]]
     pointer allocate(size_type size) {
-      log("Allocate memory for " + std::to_string(size) + " items.");
+      LOG("Allocate memory for " << size << " items." << std::endl);
       if (cursor + size > chunk_size) throw std::bad_alloc();
       auto ptr { &chunk[cursor] };
       cursor += size;
@@ -46,12 +46,12 @@ namespace otus {
     }
 
     void deallocate(pointer ptr, size_type size) const noexcept {
-      log("Query for deallocation, do nothing.");
+      LOG("Query for deallocation, do nothing." << std::endl);
     }
 
     template<typename U, typename ...Args>
     void construct(U *ptr, Args &&...args) const {
-      log("Emplace item.");
+      LOG("Emplace item." << std::endl);
       new(ptr) U(std::forward<Args>(args)...);
     }
 

@@ -1,17 +1,12 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#ifdef DEBUG
-#include <iostream>
-#endif
+#define LOG(x)
 
-namespace otus {
-  void log(const std::string &s) {
-    #ifdef DEBUG
-    std::cerr << s << std::endl;
-    #endif
-    return;
-  }
-}
+#ifdef DEBUG
+  #include <iostream>
+  #undef LOG
+  #define LOG(x) (std::cerr << x)
+#endif
 
 #endif
