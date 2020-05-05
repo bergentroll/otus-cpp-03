@@ -19,7 +19,18 @@ if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   add_compile_definitions(DEBUG)
 endif()
 
+find_package(benchmark)
+
 add_executable(allocator ${SRC_PATH}/main.cpp)
+
+if(benchmark_FOUND)
+  add_executable(profiling ${TEST_PATH}/profiling.cpp)
+  target_link_libraries(profiling benchmark)
+else()
+  message(
+    WARNING
+    "Profiling will not be launched because benchmark library is not found.")
+endif()
 
 if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
   add_subdirectory(${GTEST_SRCDIR}/ ${CMAKE_BINARY_DIR}/gtest/ EXCLUDE_FROM_ALL)
@@ -29,7 +40,6 @@ if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
     test_suite
     PRIVATE
     gtest)
-  enable_testing()
   add_test(test_suite test_suite)
 else()
   message(
@@ -37,6 +47,8 @@ else()
     "Test suite will not be launched because GTest sources is not found at "
     "${GTEST_SRCDIR}.")
 endif()
+
+enable_testing()
 
 install(TARGETS allocator RUNTIME DESTINATION bin)
 

@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "logger.h"
+
 namespace otus {
   template <typename T, class Allocator = std::allocator<T>>
   class Container {
@@ -42,6 +44,7 @@ namespace otus {
     Container() { }
 
     // TODO Move semantics.
+    // TODO Smart pointers.
 
     Container(std::initializer_list<value_type> init) {
       for (const_reference item: init) push_back(item);
