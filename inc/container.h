@@ -56,6 +56,7 @@ namespace otus {
       deconstruct(); 
 
       for (const_reference item: other) push_back(item);
+      return *this;
     }
 
     ~Container() {
@@ -81,6 +82,10 @@ namespace otus {
       return true;
     }
 
+    bool operator!=(const Container &other) const {
+      return !((*this) == other);
+    }
+
     reference operator[](std::size_t pos) {
       return const_cast<reference>(static_cast<const Container &>(*this)[pos]);
     }
@@ -104,7 +109,7 @@ namespace otus {
     }
 
     void push_back(value_type item) {
-      log("Pushing back value " + std::to_string(item));
+      log("Pushing back value " + std::to_string(item) + ".");
 
       auto ptr { allocator.allocate(1) };
       allocator.construct(ptr, Node { item });
@@ -116,7 +121,6 @@ namespace otus {
 
       auto cursor { list_head };
       while (cursor->next) { 
-        log("VAL: " + std::to_string(cursor->data));
         cursor = cursor->next;
       }
 

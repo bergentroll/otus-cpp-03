@@ -50,7 +50,11 @@ TEST(container, assign_op) {
   otus::Container<char> c1 { 'a', 'b', 'c', '\n' };
   otus::Container<char> c2 { 'c', 'd', 'e' };
   c2 = c1;
+
   ASSERT_EQ(c1, c2);
+
+  c2.push_back('X');
+  ASSERT_NE(c1, c2);
 }
 
 TEST(container, at) {
