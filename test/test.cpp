@@ -5,11 +5,23 @@
 
 using namespace::std;
 
-//TEST(allocator, overflow) {
-//  vector<int, otus::Allocator<int, 1>> v;
-//  ASSERT_NO_THROW(v.push_back(0));
-//  ASSERT_NO_THROW(v.push_back(0));
-//}
+TEST(allocator, overflow) {
+  vector<int, otus::Allocator<int, 1>> v;
+  ASSERT_NO_THROW(v.push_back(0));
+  ASSERT_NO_THROW(v.push_back(0));
+}
+
+TEST(allocator, assign_ctr) {
+  vector<char, otus::Allocator<char, 3>> source { };
+  source.push_back('a');
+  source.push_back('b');
+  source.push_back('c');
+  source.push_back('\0');
+
+  vector<char, otus::Allocator<char, 3>> v { source };
+
+  ASSERT_EQ(v, source);
+}
 
 TEST(allocator, comparison) {
   vector<int, otus::Allocator<int, 3>> v1 { 1, 2, 3 }; 

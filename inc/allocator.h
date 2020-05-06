@@ -22,13 +22,8 @@ namespace otus {
     template<typename U>
     struct rebind { using other = Allocator<U, base_chunk_size>; };
 
-    Allocator(): list_head(new Node), list_cursor(list_head), chunk_index(0) {
+    Allocator(): list_head(create_chunk(base_chunk_size)), list_cursor(list_head), chunk_index(0) {
       LOG("Allocator::Allocator()." << std::endl);
-      // TODO Squash to method.
-      list_head->chunk =
-        reinterpret_cast<pointer>(
-          operator new[](base_chunk_size * sizeof(value_type)));
-      list_head->chunk_size = base_chunk_size;
     }
 
     Allocator(const Allocator &other) {
