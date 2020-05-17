@@ -23,16 +23,6 @@ TEST(allocator, assign_ctr) {
   ASSERT_EQ(v, source);
 }
 
-TEST(allocator, comparison) {
-  vector<int, otus::Allocator<int, 3>> v1 { 1, 2, 3 }; 
-  vector<int, otus::Allocator<int, 3>> v2 { 1, 2, 3 }; 
-
-  ASSERT_EQ(v1.get_allocator(), v2.get_allocator());
-
-  v2.push_back(4);
-  ASSERT_NE(v1.get_allocator(), v2.get_allocator());
-}
-
 TEST(container, normal_usage) {
   otus::Container<int> c;
   c.push_back(1);

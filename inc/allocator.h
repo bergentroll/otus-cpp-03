@@ -22,32 +22,15 @@ namespace otus {
     template<typename U>
     struct rebind { using other = Allocator<U, base_chunk_size>; };
 
-    Allocator(): list_head(create_chunk(base_chunk_size)), list_cursor(list_head), chunk_index(0) {
+    Allocator():
+    list_head(create_chunk(base_chunk_size)),
+    list_cursor(list_head),
+    chunk_index(0) {
       LOG("Allocator::Allocator()." << std::endl);
     }
 
-    Allocator(const Allocator &other) {
+    Allocator(const Allocator &other): Allocator() {
       LOG("Allocator::Allocator(Allocator &other)." << std::endl);
-      chunk_index = other.chunk_index;
-
-      list_head = create_chunk(other.list_head->chunk_size);
-      for (size_type i { }; i < other.list_head->chunk_size; i++)
-        list_head->chunk[i] = other.list_head->chunk[i];
-      list_cursor = list_head;
-
-      auto left_list_cursor { list_head };
-      auto right_list_cursor { other.list_head};
-
-      while (right_list_cursor->next) {
-        right_list_cursor = right_list_cursor->next;
-        left_list_cursor->next = create_chunk(other.list_head->chunk_size);
-        left_list_cursor = left_list_cursor->next;
-
-        for (size_type i { }; i < left_list_cursor->chunk_size; i++)
-          left_list_cursor->chunk[i] = right_list_cursor->chunk[i];
-
-        list_cursor = left_list_cursor;
-      }
     }
 
     /// TODO
@@ -115,26 +98,7 @@ namespace otus {
     void destroy(U *ptr) const { ptr->~U(); }
 
     bool operator==(Allocator const &other) const noexcept {
-      if (chunk_index != other.chunk_index)
-        return false;
-
-      auto left_list_cursor { list_head };
-      auto right_list_cursor { other.list_head };
-
-      while (left_list_cursor && right_list_cursor) {
-        if (left_list_cursor->chunk_size != right_list_cursor->chunk_size)
-          return false;
-        for (size_t i { }; i < left_list_cursor->chunk_size; i++) {
-          if (left_list_cursor->chunk[i] != right_list_cursor->chunk[i])
-            return false;
-        }
-        left_list_cursor = left_list_cursor->next;
-        right_list_cursor = right_list_cursor->next;
-      }
-
-      if (left_list_cursor != right_list_cursor) return false;
-
-      return true;
+      return false;
     }
 
     bool operator!=(Allocator const &other) const noexcept {

@@ -2,6 +2,7 @@
 #define CONTAINER_H
 
 #include <memory>
+#include <stdexcept>
 
 #include "logger.h"
 
@@ -152,6 +153,7 @@ namespace otus {
       auto cursor { list_head };
       while (cursor) {
         cursor = list_head->next;
+        allocator.destroy(list_head);
         allocator.deallocate(list_head, 1);
         list_head = cursor;
       }
