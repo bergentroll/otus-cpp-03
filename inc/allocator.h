@@ -98,6 +98,7 @@ namespace otus {
     void destroy(U *ptr) const { ptr->~U(); }
 
     bool operator==(Allocator const &other) const noexcept {
+      if (this == &other) return true;
       return false;
     }
 

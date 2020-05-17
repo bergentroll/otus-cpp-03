@@ -23,17 +23,28 @@ TEST(allocator, assign_ctr) {
   ASSERT_EQ(v, source);
 }
 
+TEST(allocator, comparison) {
+  vector<int, otus::Allocator<int, 3>> v1 { 1, 2, 3 };
+  vector<int, otus::Allocator<int, 3>> v2 { 1, 2, 3 };
+
+  EXPECT_NE(v1.get_allocator(), v2.get_allocator());
+
+  otus::Allocator<int> alloc1 { };
+  otus::Allocator<int> &alloc2 { alloc1 };
+  EXPECT_EQ(alloc1, alloc2);
+}
+
 TEST(container, normal_usage) {
   otus::Container<int> c;
   c.push_back(1);
   c.push_back(2);
 
-  ASSERT_EQ(c[0], 1);
-  ASSERT_EQ(c[1], 2);
+  EXPECT_EQ(c[0], 1);
+  EXPECT_EQ(c[1], 2);
 
   c[0] = 3;
 
-  ASSERT_EQ(c[0], 3);
+  EXPECT_EQ(c[0], 3);
 }
 
 TEST(container, initializer_list) {
@@ -63,20 +74,20 @@ TEST(container, assign_op) {
   otus::Container<char> c2 { 'c', 'd', 'e' };
   c2 = c1;
 
-  ASSERT_EQ(c1, c2);
+  EXPECT_EQ(c1, c2);
 
   c2.push_back('X');
-  ASSERT_NE(c1, c2);
+  EXPECT_NE(c1, c2);
 }
 
 TEST(container, at) {
   otus::Container<long> c { 100, 1000, 10000 };
-  ASSERT_NO_THROW(c.at(2));
-  ASSERT_THROW(c.at(3), std::out_of_range);
+  EXPECT_NO_THROW(c.at(2));
+  EXPECT_THROW(c.at(3), std::out_of_range);
 
   const otus::Container<long> c_const { 100, 1000, 10000 };
-  ASSERT_NO_THROW(c_const.at(2));
-  ASSERT_THROW(c_const.at(3), std::out_of_range);
+  EXPECT_NO_THROW(c_const.at(2));
+  EXPECT_THROW(c_const.at(3), std::out_of_range);
 }
 
 
