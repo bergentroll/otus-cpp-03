@@ -80,6 +80,20 @@ TEST(container, assign_op) {
   EXPECT_NE(c1, c2);
 }
 
+TEST(container, eq_op) {
+  otus::Container<char> c1 { 'a', 'b', 'c', '\n' };
+  otus::Container<char> c2 { 'a', 'b', 'c' };
+
+  EXPECT_NE(c1, c2);
+
+  c2.push_back('\n');
+  EXPECT_EQ(c1, c2);
+
+  c1.push_back('1');
+  c2.push_back('2');
+  EXPECT_NE(c1, c2);
+}
+
 TEST(container, at) {
   otus::Container<long> c { 100, 1000, 10000 };
   EXPECT_NO_THROW(c.at(2));

@@ -79,8 +79,9 @@ namespace otus {
     bool operator==(const Container &other) const {
       if (size() != other.size()) return false;
 
+      // TODO Use iterators.
       for (size_type i { }; i < size(); i++)
-        if (operator[](0) != other[0]) return false;
+        if (operator[](i) != other[i]) return false;
 
       return true;
     }
